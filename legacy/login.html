@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Tax Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            purple: '#8b5cf6',
+                            blue: '#3b82f6',
+                            green: '#10b981',
+                            cyan: '#06b6d4',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-effect {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 min-h-screen flex items-center justify-center p-4">
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-1/4 -left-20 w-96 h-96 bg-accent-purple opacity-20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-accent-cyan opacity-20 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="relative w-full max-w-md animate-slide-up">
+        <div class="glass-effect rounded-2xl p-8 shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-accent-purple to-accent-blue rounded-xl mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">Tax Dashboard</h1>
+                <p class="text-slate-400">Sign in to manage your expenses</p>
+            </div>
+
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email"
+                        required
+                        class="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all"
+                        placeholder="you@example.com"
+                    >
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password"
+                        required
+                        class="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-transparent transition-all"
+                        placeholder="••••••••"
+                    >
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="w-4 h-4 rounded border-slate-700 bg-slate-900/50 text-accent-blue focus:ring-accent-blue focus:ring-offset-slate-950">
+                        <span class="ml-2 text-sm text-slate-400">Remember me</span>
+                    </label>
+                    <a href="#" class="text-sm text-accent-blue hover:text-accent-cyan transition-colors">Forgot password?</a>
+                </div>
+
+                <button 
+                    type="submit"
+                    class="w-full py-3 px-4 bg-gradient-to-r from-accent-purple to-accent-blue text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-accent-purple/50 transition-all duration-300 transform hover:scale-[1.02]"
+                >
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-slate-400 text-sm">
+                    Don't have an account? 
+                    <a href="#" class="text-accent-blue hover:text-accent-cyan transition-colors font-medium">Sign up</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center text-slate-500 text-xs">
+            <p>Demo credentials: any email/password will work</p>
+        </div>
+    </div>
+
+    <script src="src/auth.js"></script>
+</body>
+</html>

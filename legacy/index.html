@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Dashboard - Expense Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            purple: '#8b5cf6',
+                            blue: '#3b82f6',
+                            green: '#10b981',
+                            cyan: '#06b6d4',
+                            orange: '#f59e0b',
+                            pink: '#ec4899',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(-20px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-effect {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .glass-effect-light {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid transparent;
+        }
+
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .sidebar-item {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateX(4px);
+        }
+
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-white">
+    <!-- Background gradients -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-accent-purple opacity-10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-cyan opacity-10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="flex h-screen relative">
+        <!-- Sidebar -->
+        <aside class="w-64 glass-effect p-6 flex flex-col animate-slide-in">
+            <div class="mb-8">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-accent-purple to-accent-blue rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold">TaxDash</h2>
+                        <p class="text-xs text-slate-400">Expense Manager</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex-1 space-y-2">
+                <a href="#"
+                    class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-accent-purple/20 to-accent-blue/20 text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                        </path>
+                    </svg>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                <a href="#"
+                    class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                        </path>
+                    </svg>
+                    <span class="font-medium">Transactions</span>
+                </a>
+                <a href="#"
+                    class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                        </path>
+                    </svg>
+                    <span class="font-medium">Analytics</span>
+                </a>
+                <a href="#"
+                    class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <span class="font-medium">Vendors</span>
+                </a>
+                <a href="#"
+                    class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="font-medium">Settings</span>
+                </a>
+            </nav>
+
+            <div class="mt-auto pt-6 border-t border-slate-700">
+                <div class="flex items-center gap-3 mb-4">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-accent-green to-accent-cyan rounded-full flex items-center justify-center text-sm font-bold">
+                        <span id="userInitial">U</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium" id="userName">User</p>
+                        <p class="text-xs text-slate-400">Administrator</p>
+                    </div>
+                </div>
+                <button onclick="logout()"
+                    class="w-full px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                        </path>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto">
+            <!-- Top Bar -->
+            <header class="glass-effect-light sticky top-0 z-10 px-8 py-4 flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold">Dashboard</h1>
+                    <p class="text-slate-400 text-sm">Welcome back! Here's your expense overview</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <input type="search" placeholder="Search transactions..."
+                            class="w-64 px-4 py-2 pl-10 bg-slate-900/50 border border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-transparent">
+                        <svg class="w-5 h-5 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <button class="relative p-2 bg-slate-900/50 rounded-lg hover:bg-slate-800 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
+                        </svg>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-accent-pink rounded-full"></span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="p-8 space-y-6">
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-scale-in">
+                    <!-- Total Amount Card -->
+                    <div class="stat-card glass-effect rounded-xl p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="p-3 bg-gradient-to-br from-accent-purple to-accent-blue rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded-full">+12.5%</span>
+                        </div>
+                        <h3 class="text-slate-400 text-sm font-medium mb-1">Total Amount</h3>
+                        <p class="text-3xl font-bold" id="totalAmount">$0.00</p>
+                    </div>
+
+                    <!-- Total Tax Card -->
+                    <div class="stat-card glass-effect rounded-xl p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="p-3 bg-gradient-to-br from-accent-green to-accent-cyan rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Tax</span>
+                        </div>
+                        <h3 class="text-slate-400 text-sm font-medium mb-1">Total Tax</h3>
+                        <p class="text-3xl font-bold" id="totalTax">$0.00</p>
+                    </div>
+
+                    <!-- Transactions Card -->
+                    <div class="stat-card glass-effect rounded-xl p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="p-3 bg-gradient-to-br from-accent-orange to-accent-pink rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full">Total</span>
+                        </div>
+                        <h3 class="text-slate-400 text-sm font-medium mb-1">Transactions</h3>
+                        <p class="text-3xl font-bold" id="transactionCount">0</p>
+                    </div>
+
+                    <!-- Avg Transaction Card -->
+                    <div class="stat-card glass-effect rounded-xl p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="p-3 bg-gradient-to-br from-accent-cyan to-accent-blue rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">Avg</span>
+                        </div>
+                        <h3 class="text-slate-400 text-sm font-medium mb-1">Avg Transaction</h3>
+                        <p class="text-3xl font-bold" id="avgTransaction">$0.00</p>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Trend Chart -->
+                    <div class="glass-effect rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold">Expense Trend</h3>
+                                <p class="text-sm text-slate-400">Daily transaction amounts</p>
+                            </div>
+                            <select
+                                class="px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 90 days</option>
+                            </select>
+                        </div>
+                        <canvas id="trendChart" height="250"></canvas>
+                    </div>
+
+                    <!-- Payment Method Breakdown -->
+                    <div class="glass-effect rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold">Payment Methods</h3>
+                                <p class="text-sm text-slate-400">Distribution by payment type</p>
+                            </div>
+                        </div>
+                        <canvas id="paymentChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions Table -->
+                <div class="glass-effect rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold">Recent Transactions</h3>
+                            <p class="text-sm text-slate-400">Latest expense records</p>
+                        </div>
+                        <button
+                            class="px-4 py-2 bg-gradient-to-r from-accent-purple to-accent-blue rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-accent-purple/30 transition-all">
+                            View All
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-slate-700">
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-slate-400">Status</th>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-slate-400">Date</th>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-slate-400">Receipt ID</th>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-slate-400">Vendor</th>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-slate-400">Description
+                                    </th>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-slate-400">Payment</th>
+                                    <th class="text-right py-3 px-4 text-sm font-semibold text-slate-400">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsTable">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+    <script src="src/auth.js"></script>
+</body>
+
+</html>

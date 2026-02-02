@@ -1,0 +1,40 @@
+import { createClient } from '@/utils/supabase/server'
+import { NextResponse } from 'next/server'
+
+export async function GET(request: Request) {
+    // The `/auth/callback` route is required for the server-side auth flow implemented
+    // by the SSR package. It exchanges an auth code for the user's session.
+    // https://supabase.com/docs/guides/auth/server-side/nextjs
+    const requestUrl = new URL(request.url)
+    const code = requestUrl.searchParams.get('code')
+    const origin = requestUrl.origin
+    const next = requestUrl.searchParams.get('next') ?? '/'
+
+    console.log('--- AUTH CALLBACK ---')
+    console.log('Code present:', !!code)
+    console.log('Origin:', origin)
+
+    if (code) {
+        const supabase = createClient()
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        if (!error) {
+            console.log('Session exchange successful')
+            const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
+            const isLocalEnv = process.env.NODE_ENV === 'development'
+            if (isLocalEnv) {
+                // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
+                return NextResponse.redirect(`${origin}${next}`)
+            } else if (forwardedHost) {
+                return NextResponse.redirect(`https://${forwardedHost}${next}`)
+            } else {
+                return NextResponse.redirect(`${origin}${next}`)
+            }
+        } else {
+            console.error('Session exchange error:', error)
+            return NextResponse.redirect(`${origin}/login?message=Auth Failed: ${error.message}`)
+        }
+    }
+
+    // URL to redirect to after sign in process completes
+    return NextResponse.redirect(`${origin}/`)
+}
