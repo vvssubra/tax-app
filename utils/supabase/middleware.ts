@@ -58,6 +58,7 @@ export async function updateSession(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     // Protected Routes Logic
+    // 1. Redirect UNAUTHENTICATED users to /login (except for public routes)
     if (
         !user &&
         !request.nextUrl.pathname.startsWith('/login') &&
@@ -66,9 +67,18 @@ export async function updateSession(request: NextRequest) {
         !request.nextUrl.pathname.startsWith('/pricing') &&
         request.nextUrl.pathname !== '/'
     ) {
-        // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone()
         url.pathname = '/login'
+        return NextResponse.redirect(url)
+    }
+
+    // 2. Redirect AUTHENTICATED users away from /login to the dashboard
+    if (
+        user &&
+        request.nextUrl.pathname.startsWith('/login')
+    ) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/transactions'
         return NextResponse.redirect(url)
     }
 
